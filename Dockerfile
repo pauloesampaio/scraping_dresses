@@ -5,4 +5,4 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
-CMD ["scrapy", "crawl", "get_dresses"]
+CMD ["sh", "-c", "scrapy crawl dresses_am && scrapy crawl dresses_rn"]
