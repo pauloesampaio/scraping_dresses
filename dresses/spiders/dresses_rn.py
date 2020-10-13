@@ -47,13 +47,11 @@ class GetDressesSpider(scrapy.Spider):
                 args={"lua_source": self.script},
             )
 
-
     def parse_price(self, product_price):
-        product_price = product_price.replace(",",".")
-        product_price = product_price.replace("R$","")
+        product_price = product_price.replace(",", ".")
+        product_price = product_price.replace("R$", "")
         product_price = float(product_price)
         return product_price
-   
 
     def parse_product(self, response):
         product_images = response.xpath(
@@ -63,7 +61,7 @@ class GetDressesSpider(scrapy.Spider):
         product_sku = int(product_url.split("sku=")[-1])
         product_price = response.xpath(
             '//div[@class="main_product_info"]/div/div[@id="js-div-buy"]/span/div/span/text()'
-            ).get()
+        ).get()
         if product_price:
             product_price = self.parse_price(product_price)
         yield {

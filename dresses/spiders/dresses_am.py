@@ -31,14 +31,17 @@ class GetDressesSpider(scrapy.Spider):
             url=self.start_urls[0],
             callback=self.parse,
             endpoint="render.json",
-            args={"lua_source": self.script, "wait": 5, 'html': 1},
+            args={"lua_source": self.script, "wait": 5, "html": 1},
         )
 
     def parse(self, response):
         text_response = response.data["html"]
-        text_response = text_response.replace('<html><head></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">', '')
-        text_response = text_response.replace('</pre></body></html>', '')
-        text_response = text_response.replace('\n', '')
+        text_response = text_response.replace(
+            '<html><head></head><body><pre style="word-wrap: break-word; white-space: pre-wrap;">',
+            "",
+        )
+        text_response = text_response.replace("</pre></body></html>", "")
+        text_response = text_response.replace("\n", "")
         json_response = json.loads(text_response)
         for product in json_response.get("products"):
             yield {
@@ -51,17 +54,15 @@ class GetDressesSpider(scrapy.Spider):
                 "crawl_date": datetime.datetime.utcnow(),
             }
         current_page = json_response.get("pagination").get("currentPage")
-        total_pages = json_response.get("pagination").get("totalPages")-1
+        total_pages = json_response.get("pagination").get("totalPages") - 1
         print(f"crawler page {current_page} out of {total_pages}")
         if current_page < total_pages:
-            next_page = f"https://api.c6mp-areosltdb1-p1-public.model-t.cc.commerce.ondemand.com/amaroecpcommercewebservices/v2/amaro-br/products/search?query=:date:department:roupas-femininas:category:vestidos&pageSize=48&currentPage={current_page+1}&fields=FULL&curr=BRL&lang=pt"
+            next_page = f"https://api.c6mp-areosltdb1-p1-public.model-t.cc.commerce.ondemand.com/amaroecpcommercewebservices/v2/amaro-br/products/search?query=:date:department:roupas-femininas:category:vestidos&pageSize=48&currentPage={current_page + 1}&fields=FULL&curr=BRL&lang=pt"
             print(f"next_page_url: {next_page}")
             print("NEXT")
-            yield SplashRequest(url=next_page,
-                                callback=self.parse,
-                                endpoint="render.json",
-                                args={"lua_source": self.script, 
-                                      "wait": 5, 
-                                      'html': 1
-                                      }
-                                )
+            yield SplashRequest(
+                url=next_page,
+                callback=self.parse,
+                endpoint="render.json",
+                args={"lua_source": self.script, "wait": 5, "html": 1},
+            )
